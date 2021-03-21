@@ -1,0 +1,40 @@
+#Correr en la terminal o donde se tenga instalado Blast.
+
+### 1. Buscar un archivo de secuencias homologas de proteínas en formato fasta.
+
+### 2. Correr BLASTP de todas las secuencias contra todas las secuencias.
+
+blastp -query ABC.faa -subject ABC.faa -outfmt 7 -max_hsps 1 -evalue 100 -use_sw_tback > TODOSconTODOS
+
+###3. Generar una matriz de disimilitud (distancia) con base en los bit scores generados.
+
+
+#Para generar esa matriz necesitamos deshacernos de la información que no necesitamos. Al hacer Blastp se generan 12 columnas con info. para cada secuencia y también una breve descripción(comenzando con #) sobre la secuencia que se alineó. NO necesitamos la info. extra, así que primero quitamos esa info.(renglones que inicien con #).
+
+sed -i.original '/^#/d' TODOSconTODOS
+
+# Se generan 2 archivos. El que tiene gatos(#) es el archivo con la extensión ".original" y el que no tiene(#) es el que no tiene esa extensión.
+
+
+#Para quedarnos con las columnas que necesitamos 1,2,12.
+
+awk '{print $1,$2,$12}' TODOSconTODOS > Bitscores
+
+#Para poder hacer el paso 4 y normalizar las disimilitudes vamos a necesitar el máximo bit score de todos los alineamientos.
+
+awk -v max=0 '{if($1>max){content=$0; max=$1}}END{print content}' COLUMNA12
+
+#Con el sig. comando ordenamos el archivo y cada uno de los resulatdos de los alineamientos de las 200 secuencias de la sig. manera: Primero por la info de la primera columna(orden alfabético) y despues con la info. de la segunda(orden alfabético). De esta forma logramos que la segunda columna, tenga un patron  que se pueda utilizar para realizar la matriz de disimilitud con mayor facilidad.
+
+sort -n -k 1 Bitscores > tabla_ORDENADA
+
+#En la segunda columna, los primeras 100 renglones corresponden a los nombres ordenados alfabeticamente de las 100 secuencias que alineamos.Los otros 100 renglones que le siguen vuelven a repetir la info. de los 100 primeros 100 y así...
+
+#Para asegurarnos que todas las secuencias se hayan alineado con todas corremos el sig. comando.
+
+wc -l TODOSconTODOS
+
+# El comando cuenta las lineas y en teoría deben ser 100 x 100 =10000 lineas. Si salen menos habrá que ver cuales secuencias no se alinearon con cuales...
+
+
+
